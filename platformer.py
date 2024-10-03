@@ -21,6 +21,7 @@ last_attack = 0
 # Attack damage
 ATTACK1_DAMAGE = 40
 ATTACK2_DAMAGE = 25
+ATTACK3_DAMAGE = 33  
 
 # Player actions
 moving_left = False
@@ -54,7 +55,7 @@ class Character(pygame.sprite.Sprite):
         self.update_time = pygame.time.get_ticks()
 
         # Load sprites
-        animation_types = ['idle', 'walk', 'jump', 'attack1', 'attack2', 'dead']
+        animation_types = ['idle', 'walk', 'jump', 'attack1', 'attack2', 'attack3', 'dead']
         for animation in animation_types:
             temp_list = []
             num_of_frames = len(os.listdir(f'img/{self.char_type}/{animation}'))
@@ -113,7 +114,7 @@ class Character(pygame.sprite.Sprite):
 
         # Loop animation unless it's a death animation
         if self.frame_index >= len(self.animation_list[self.action]):
-            if self.action == 5:  # If it's the death animation, don't loop
+            if self.action == 6:  # If it's the death animation, don't loop
                 self.frame_index = len(self.animation_list[self.action]) - 1
             else:
                 self.frame_index = 0
@@ -156,7 +157,7 @@ class Enemy(Character):
             if self.health <= 0:
                 self.health = 0
                 self.alive = False
-                self.update_action(5)  # Trigger death animation
+                self.update_action(6)  # Trigger death animation
                 print("Enemy died!")  # Debug output to confirm enemy death
 
     def draw_health_bar(self):
@@ -193,6 +194,9 @@ def check_attack():
             elif attack_type == 2:  # Attack2 does 25 damage
                 print("Attack 2 hit!")
                 enemy.take_damage(ATTACK2_DAMAGE)
+            elif attack_type == 3:  # Attack3 does 33 damage
+                print("Attack 3 hit!")
+                enemy.take_damage(ATTACK3_DAMAGE)
             attack_hit_registered = True  # Mark hit as registered for this attack
 
 run = True
@@ -226,6 +230,8 @@ while run:
                 player.update_action(3)  # Attack1
             elif attack_type == 2:
                 player.update_action(4)  # Attack2
+            elif attack_type == 3:
+                player.update_action(5)
         elif player.in_air:
             player.update_action(2)  # Jump
         elif moving_left or moving_right:
@@ -257,6 +263,11 @@ while run:
                 attack_type = 2
                 last_attack = pygame.time.get_ticks()
                 player.update_action(4)  # 4: Attack2
+            if event.key == pygame.K_r and not attacking:  # Attack3
+                attacking = True
+                attack_type = 3
+                last_attack = pygame.time.get_ticks()
+                player.update_action(5)  # 5: Attack3
             if event.key == pygame.K_ESCAPE:
                 run = False
         # Keyboard release
